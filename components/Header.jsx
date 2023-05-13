@@ -3,7 +3,7 @@ import Image from 'next/image';
 
 export const Header = () => {
     return (
-        <header className="flex justify-start items-center p-4 bg-white shadow-md">
+        <header className="flex justify-start items-center p-4 bg-neutral-900 shadow-md">
             <div className="flex items-center px-4">
                 <Image
                     src="/rainbow.png" 
@@ -15,7 +15,7 @@ export const Header = () => {
 
             <div className="relative text-gray-600 w-2/5">
                 <input
-                    className="border-2 border-gray-300 bg-white h-10 px-5 pr-10 w-full rounded-lg text-sm focus:outline-none"
+                    className="border-2 border-gray-600 text-gray-400 bg-black h-10 px-5 pr-10 w-full rounded-lg text-sm focus:outline-none"
                     type="search"
                     name="search"
                     placeholder="Search for a place"
