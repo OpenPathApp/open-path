@@ -6,7 +6,7 @@ export const Header = () => {
         <header className="flex justify-between items-center p-4 bg-neutral-900 shadow-md">
             <div className="flex items-center px-4">
                 <Image
-                    src="/rainbow.png" 
+                    src="/open-path-logo.png" 
                     alt="Logo"
                     width={35}
                     height={35}
