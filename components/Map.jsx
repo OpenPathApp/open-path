@@ -3,6 +3,36 @@ import { useMemo, useState, useEffect, useContext } from "react";
 import { getSafetyLatLong, getRestroomsLatLong } from "@/data";
 import { FilterContext } from '../src/FilterContext';
 
+export const nearbyPlaces = {name:[], coords:[]}
+
+function getNearbyPlaces(results){
+    nearbyPlaces.name.push(results["name"])
+    nearbyPlaces.coords.push([results["geometry"]["location"]["lat"], results["geometry"]["location"]["lng"]] )
+}
+
+export const Type = (latCoord, longCoord, type) =>{
+    var axios = require('axios');
+    
+        var config = {
+        method: 'get',
+        url: 'https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=' + latCoord +'%2C' + longCoord+'&radius=1500&type='+type+'&keyword=cruise&key=AIzaSyAP6ZI6gP5_EmAu8md6W8uXBNM3eEXqx_A',
+        headers: { }
+        };
+    
+        axios(config)
+        .then(function (response) {
+        console.log(JSON.stringify(response.data));
+    
+        //loop through response to find name and coordinates, then create markers 
+        response.data["results"].forEach(getNearbyPlaces)
+    
+        })
+        .catch(function (error) {
+        console.log(error);
+        });
+
+};
+
 export const Map = ({ center }) => {
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: 'AIzaSyAP6ZI6gP5_EmAu8md6W8uXBNM3eEXqx_A',
@@ -25,6 +55,11 @@ export const Map = ({ center }) => {
         .then((ratings) => setSafetyRating(ratings[0]));
     }
   }, [selectedRestroom]);
+
+  //search for locations around and make list of them
+  //filter list from apis
+    
+  //traverse thru list and create markers for each
 
   return (
     <div className="h-[48rem] w-3/4 m-auto rounded-lg mt-10 overflow-hidden">
