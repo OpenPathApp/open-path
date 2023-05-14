@@ -33,7 +33,7 @@ export const Type = (latCoord, longCoord, type) =>{
 
 };
 
-export const Map = () => {
+export const Map = ({ center }) => {
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: 'AIzaSyAP6ZI6gP5_EmAu8md6W8uXBNM3eEXqx_A',
   });
