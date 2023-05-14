@@ -132,7 +132,7 @@ async function getNearbyPlaces(coordinates, type) {
     coordinates[1] +
     "&radius=15000&type=" +
     type +
-    "&keyword=cruise&key=AIzaSyAP6ZI6gP5_EmAu8md6W8uXBNM3eEXqx_A";
+    "&keyword=lgbt&key=AIzaSyAP6ZI6gP5_EmAu8md6W8uXBNM3eEXqx_A";
 
   try {
     const response = await fetch(url);
