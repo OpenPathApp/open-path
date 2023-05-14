@@ -8,6 +8,8 @@ import { locationToLatLong } from '@/data'
 
 export default function Home() {
   const [showRestrooms, setShowRestrooms] = React.useState(false);
+  const [showHotels, setShowHotels] = React.useState(false);
+  const [showRestaurants, setShowRestaurants] = React.useState(false);
 
   const [center, setCenter] = React.useState({ lat: 40.73061, lng: -73.935242 });
 
@@ -22,7 +24,9 @@ export default function Home() {
 
 
   return (
-    <FilterContext.Provider value={{ showRestrooms, setShowRestrooms }}>
+    <FilterContext.Provider value={{ showRestrooms, setShowRestrooms,
+     showHotels, setShowHotels,
+     showRestaurants, setShowRestaurants }}>
       {/* Your components here */}
       <Header onSearch={handleSearch} />
       <Filter />

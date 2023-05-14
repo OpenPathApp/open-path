@@ -1,6 +1,6 @@
 import { GoogleMap, Marker, useLoadScript, InfoWindow } from "@react-google-maps/api";
 import { useState, useEffect, useContext } from "react";
-import { getSafetyLatLong, getRestroomsLatLong, getHotelsLatLong, getRestaurantsLatLong } from "@/data";
+import { getSafetyLatLong, getRestroomsLatLong, getNearbyPlaces } from "@/data";
 import { FilterContext } from '../src/FilterContext';
 
 export const Map = ({ center }) => {
@@ -22,8 +22,8 @@ export const Map = ({ center }) => {
 
   useEffect(() => {
     getRestroomsLatLong([center.lat, center.lng]).then(data => setRestrooms(data));
-    getHotelsLatLong([center.lat, center.lng]).then(data => setHotels(data));
-    getRestaurantsLatLong([center.lat, center.lng]).then(data => setRestaurants(data));
+    getNearbyPlaces([center.lat, center.lng], "lodging").then(data => setHotels(data));
+    getNearbyPlaces([center.lat, center.lng], "restaurant").then(data => setRestaurants(data));
   }, [center]);
 
   useEffect(() => {
