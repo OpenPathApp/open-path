@@ -8,6 +8,9 @@ const SAFETY_API_SECRET = "hPXuy9gdS59DR7Aq";
 
 const RESTROOM_API = "https://refugerestrooms.org/api/v1/restrooms/by_location";
 
+const GEOCODING_API = "https://maps.googleapis.com/maps/api/geocode/json";
+const MAPS_API_KEY = "AIzaSyAP6ZI6gP5_EmAu8md6W8uXBNM3eEXqx_A";
+
 
 
 async function getSafetyLatLong(coords) {
@@ -84,6 +87,30 @@ async function getRestroomsLatLong(coordinate) {
     }).then(res => res.json());
 }
 
+async function locationToLatLong(location) {
+    /*
+    Returns lat and long from a location name
+    - Input: location name as a string
+    - Output: [lat, lng]
+        *** Returns [undefined, undefined] if location is invalid
+    */
+    const api_url = GEOCODING_API + "?" + new URLSearchParams([
+        ["address", location],
+        ["key", MAPS_API_KEY]
+    ]).toString();
+    return fetch(api_url, {
+        method: "GET"
+    }).then(res => res.json())
+    .then(data => {
+        if ("results" in data && data["status"] === "OK") {
+            const location = data["results"][0]["geometry"]["location"];
+            return [location["lat"], location["lng"]];
+        } else {
+            return [undefined, undefined];
+        }
+    });
+}
+
 function test() {
     // Ignore lol
     const coords = [
@@ -100,6 +127,10 @@ function test() {
             console.log(restroomArray[0]["name"]);
         });
     })
+    // Test geocoding
+    locationToLatLong("New York City").then(latlng => {
+        console.log(latlng);
+    });
 }
 
-export {getSafetyLatLong, getRestroomsLatLong};
+export {getSafetyLatLong, getRestroomsLatLong, locationToLatLong};
