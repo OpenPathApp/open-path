@@ -3,11 +3,10 @@ import { useMemo, useState, useEffect, useContext } from "react";
 import { getSafetyLatLong, getRestroomsLatLong } from "@/data";
 import { FilterContext } from '../src/FilterContext';
 
-export const Map = () => {
+export const Map = ({ center }) => {
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: 'AIzaSyAP6ZI6gP5_EmAu8md6W8uXBNM3eEXqx_A',
   });
-  const center = useMemo(() => ({ lat: 40.730610, lng: -73.935242 }), []);
   
   const [restrooms, setRestrooms] = useState([]);
   const [selectedRestroom, setSelectedRestroom] = useState(null);
@@ -35,7 +34,7 @@ export const Map = () => {
         <GoogleMap
           mapContainerClassName="h-3/4 w-full"
           center={center}
-          zoom={14}
+          zoom={15}
         >
           {showRestrooms && restrooms.map((restroom) => (
             <Marker
@@ -55,7 +54,7 @@ export const Map = () => {
               }}
             >
               <div>
-                <h2>{selectedRestroom.name}</h2>
+                <h1>{selectedRestroom.name}</h1>
                 {<p>Safety: {safetyRating}</p>}
               </div>
             </InfoWindow>
