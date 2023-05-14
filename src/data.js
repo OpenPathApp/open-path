@@ -111,6 +111,44 @@ async function locationToLatLong(location) {
     });
 }
 
+export const nearbyPlaces = { name: [], coords: [] };
+
+function getNearbyPlaces(results) {
+  nearbyPlaces.name.push(results["name"]);
+  nearbyPlaces.coords.push([
+    results["geometry"]["location"]["lat"],
+    results["geometry"]["location"]["lng"],
+  ]);
+}
+
+export const Type = (latCoord, longCoord, type) => {
+  const axios = require("axios");
+
+  const config = {
+    method: "get",
+    url:
+      "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=" +
+      latCoord +
+      "%2C" +
+      longCoord +
+      "&radius=1500&type=" +
+      type +
+      "&keyword=cruise&key=AIzaSyAP6ZI6gP5_EmAu8md6W8uXBNM3eEXqx_A",
+    headers: {},
+  };
+
+  axios(config)
+    .then(function (response) {
+      console.log(JSON.stringify(response.data));
+
+      //loop through response to find name and coordinates, then create markers
+      response.data["results"].forEach(getNearbyPlaces);
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
+};
+
 function test() {
     // Ignore lol
     const coords = [
