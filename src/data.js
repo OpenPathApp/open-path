@@ -1,5 +1,7 @@
 // Functions for getting data from APIs
 
+const axios = require("axios");
+
 // We don't really care if the api keys are public tbh
 const SAFETY_API = "https://test.api.amadeus.com/v1/safety/safety-rated-locations";
 const SAFETY_API_OAUTH = "https://test.api.amadeus.com/v1/security/oauth2/token";
@@ -111,43 +113,45 @@ async function locationToLatLong(location) {
     });
 }
 
-export const nearbyPlaces = { name: [], coords: [] };
+// --------------------------------------------------
 
-function getNearbyPlaces(results) {
-  nearbyPlaces.name.push(results["name"]);
-  nearbyPlaces.coords.push([
-    results["geometry"]["location"]["lat"],
-    results["geometry"]["location"]["lng"],
-  ]);
-}
+// export const nearbyPlaces = { name: [], coords: [] };
 
-export const Type = (latCoord, longCoord, type) => {
-  const axios = require("axios");
-
-  const config = {
-    method: "get",
-    url:
-      "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=" +
-      latCoord +
-      "%2C" +
-      longCoord +
-      "&radius=1500&type=" +
-      type +
-      "&keyword=cruise&key=AIzaSyAP6ZI6gP5_EmAu8md6W8uXBNM3eEXqx_A",
-    headers: {},
-  };
-
-  axios(config)
-    .then(function (response) {
-      console.log(JSON.stringify(response.data));
-
-      //loop through response to find name and coordinates, then create markers
-      response.data["results"].forEach(getNearbyPlaces);
-    })
-    .catch(function (error) {
-      console.log(error);
+function getNearbyPlaces(coordinates, type) {
+    /*
+    Returns nearby results for certain location types
+    - Input: coordinates = [lat, lng]
+             type = string ("lodging", "restaurant", etc)
+    - Returns: [ {"name": x, "latitude": x, "longitude": x}, ...]
+    */
+    let nearbyPlaces = [];
+    const config = {
+        method: "get",
+        url:
+            "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=" +
+            latCoord +
+            "%2C" +
+            longCoord +
+            "&radius=1500&type=" +
+            type +
+            "&keyword=cruise&key=AIzaSyAP6ZI6gP5_EmAu8md6W8uXBNM3eEXqx_A",
+        headers: {},
+    };
+    axios(config).then(response => {
+        console.log(JSON.stringify(response.data));
+        //loop through response to find name and coordinates, then create markers
+        response.data["results"].forEach(location => {
+            nearbyPlaces.push({
+                "name": location["name"],
+                "latitude": location["geometry"]["location"]["lat"],
+                "longitude": location["geometry"]["location"]["lng"]
+            });
+        });
+    }).catch(error => {
+        console.log(error);
     });
-};
+    return nearbyPlaces;
+}
 
 function test() {
     // Ignore lol
@@ -171,4 +175,4 @@ function test() {
     });
 }
 
-export {getSafetyLatLong, getRestroomsLatLong, locationToLatLong};
+export {getSafetyLatLong, getRestroomsLatLong, locationToLatLong, getNearbyPlaces};
