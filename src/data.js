@@ -32,7 +32,7 @@ async function getSafetyLatLong(coords) {
     const rateLimit = 750;  // a little under 2 requests per second
     let safetyArray = new Array(l).fill(0);
     return new Promise((resolve, reject) => {
-        for (i = 0; i < l; i++) {
+        for (let i = 0; i < l; i++) {
             const index = i;
             const api_url = SAFETY_API + "?" + new URLSearchParams([
                 ["latitude", coords[index][0]],
