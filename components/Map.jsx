@@ -3,7 +3,6 @@ import { useMemo, useState, useEffect, useContext } from "react";
 import { getSafetyLatLong, getRestroomsLatLong } from "@/data";
 import { FilterContext } from '../src/FilterContext';
 
-import { GoogleMap, Marker, useLoadScript } from "@react-google-maps/api";
 import { useMemo } from "react";
 import './Map.css'
 
