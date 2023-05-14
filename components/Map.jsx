@@ -1,53 +1,30 @@
 import { GoogleMap, Marker, useLoadScript, InfoWindow } from "@react-google-maps/api";
-import { useMemo, useState, useEffect, useContext } from "react";
-import { getSafetyLatLong, getRestroomsLatLong } from "@/data";
+import { useState, useEffect, useContext } from "react";
+import { getSafetyLatLong, getRestroomsLatLong, getNearbyPlaces } from "@/data";
 import { FilterContext } from '../src/FilterContext';
-
-export const nearbyPlaces = {name:[], coords:[]}
-
-function getNearbyPlaces(results){
-    nearbyPlaces.name.push(results["name"])
-    nearbyPlaces.coords.push([results["geometry"]["location"]["lat"], results["geometry"]["location"]["lng"]] )
-}
-
-export const Type = (latCoord, longCoord, type) =>{
-    var axios = require('axios');
-    
-        var config = {
-        method: 'get',
-        url: 'https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=' + latCoord +'%2C' + longCoord+'&radius=1500&type='+type+'&keyword=cruise&key=AIzaSyAP6ZI6gP5_EmAu8md6W8uXBNM3eEXqx_A',
-        headers: { }
-        };
-    
-        axios(config)
-        .then(function (response) {
-        console.log(JSON.stringify(response.data));
-    
-        //loop through response to find name and coordinates, then create markers 
-        response.data["results"].forEach(getNearbyPlaces)
-    
-        })
-        .catch(function (error) {
-        console.log(error);
-        });
-
-};
 
 export const Map = ({ center }) => {
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: 'AIzaSyAP6ZI6gP5_EmAu8md6W8uXBNM3eEXqx_A',
   });
-  
+
+  const [safetyRating, setSafetyRating] = useState(null);
+
+  const { showRestrooms, showHotels, showRestaurants } = useContext(FilterContext);
+
   const [restrooms, setRestrooms] = useState([]);
+  const [hotels, setHotels] = useState([]);
+  const [restaurants, setRestaurants] = useState([]);
+
   const [selectedRestroom, setSelectedRestroom] = useState(null);
+  const [selectedHotel, setSelectedHotel] = useState(null);
+  const [selectedRestaurant, setSelectedRestaurant] = useState(null);
 
   useEffect(() => {
     getRestroomsLatLong([center.lat, center.lng]).then(data => setRestrooms(data));
+    getNearbyPlaces([center.lat, center.lng], "lodging").then(data => setHotels(data));
+    getNearbyPlaces([center.lat, center.lng], "restaurant").then(data => setRestaurants(data));
   }, [center]);
-
-  const { showRestrooms } = useContext(FilterContext);
-
-  const [safetyRating, setSafetyRating] = useState(null);
 
   useEffect(() => {
     if (selectedRestroom) {
@@ -56,10 +33,19 @@ export const Map = ({ center }) => {
     }
   }, [selectedRestroom]);
 
-  //search for locations around and make list of them
-  //filter list from apis
-    
-  //traverse thru list and create markers for each
+  useEffect(() => {
+    if (selectedHotel) {
+      getSafetyLatLong([[selectedHotel.latitude, selectedHotel.longitude]])
+        .then((ratings) => setSafetyRating(ratings[0]));
+    }
+  }, [selectedHotel]);
+
+  useEffect(() => {
+    if (selectedRestaurant) {
+      getSafetyLatLong([[selectedRestaurant.latitude, selectedRestaurant.longitude]])
+        .then((ratings) => setSafetyRating(ratings[0]));
+    }
+  }, [selectedRestaurant]);
 
   return (
     <div className="h-[48rem] w-3/4 m-auto rounded-lg mt-10 overflow-hidden">
@@ -70,7 +56,7 @@ export const Map = ({ center }) => {
           mapContainerClassName="h-3/4 w-full"
           center={center}
           zoom={15}
-        >
+        > 
           {showRestrooms && restrooms.map((restroom) => (
             <Marker
               key={restroom.name}
@@ -94,6 +80,55 @@ export const Map = ({ center }) => {
               </div>
             </InfoWindow>
           )}
+
+          {showHotels && hotels.map((hotel) => (
+            <Marker
+              key={hotel.name}
+              position={{ lat: hotel.latitude, lng: hotel.longitude }}
+              onClick={() => setSelectedHotel(hotel)}
+              icon={"http://maps.google.com/mapfiles/ms/icons/yellow-dot.png"}
+            />
+          ))}
+
+          {selectedHotel && (
+            <InfoWindow
+              position={{ lat: selectedHotel.latitude, lng: selectedHotel.longitude }}
+              onCloseClick={() => {
+                setSelectedHotel(null);
+                setSafetyRating(null);
+              }}
+            >
+              <div>
+                <h1>{selectedHotel.name}</h1>
+                {<p>Safety: {safetyRating}</p>}
+              </div>
+            </InfoWindow>
+          )}
+
+          {showRestaurants && restaurants.map((restaurant) => (
+            <Marker
+              key={restaurant.name}
+              position={{ lat: restaurant.latitude, lng: restaurant.longitude }}
+              onClick={() => setSelectedRestaurant(restaurant)}
+              icon={"http://maps.google.com/mapfiles/ms/icons/green-dot.png"}
+            />
+          ))}
+
+          {selectedRestaurant && (
+            <InfoWindow
+              position={{ lat: selectedRestaurant.latitude, lng: selectedRestaurant.longitude }}
+              onCloseClick={() => {
+                setSelectedRestaurant(null);
+                setSafetyRating(null);
+              }}
+            >
+              <div>
+                <h1>{selectedRestaurant.name}</h1>
+                {<p>Safety: {safetyRating}</p>}
+              </div>
+            </InfoWindow>
+          )}
+    
         </GoogleMap>
       )}
     </div>

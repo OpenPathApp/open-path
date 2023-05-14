@@ -1,5 +1,7 @@
 // Functions for getting data from APIs
 
+const axios = require("axios");
+
 // We don't really care if the api keys are public tbh
 const SAFETY_API = "https://test.api.amadeus.com/v1/safety/safety-rated-locations";
 const SAFETY_API_OAUTH = "https://test.api.amadeus.com/v1/security/oauth2/token";
@@ -111,6 +113,49 @@ async function locationToLatLong(location) {
     });
 }
 
+// --------------------------------------------------
+
+// export const nearbyPlaces = { name: [], coords: [] };
+
+async function getNearbyPlaces(coordinates, type) {
+  /*
+    Returns nearby results for certain location types
+    - Input: coordinates = [lat, lng]
+             type = string ("lodging", "restaurant", etc)
+    - Returns: [ {"name": x, "latitude": x, "longitude": x}, ...]
+    */
+  let nearbyPlaces = [];
+  const url =
+    "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=" +
+    coordinates[0] +
+    "%2C" +
+    coordinates[1] +
+    "&radius=1500&type=" +
+    type +
+    "&keyword=cruise&key=AIzaSyAP6ZI6gP5_EmAu8md6W8uXBNM3eEXqx_A";
+
+  try {
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const data = await response.json();
+    console.log(JSON.stringify(data));
+    //loop through response to find name and coordinates, then create markers
+    data["results"].forEach((location) => {
+      nearbyPlaces.push({
+        name: location["name"],
+        latitude: location["geometry"]["location"]["lat"],
+        longitude: location["geometry"]["location"]["lng"],
+      });
+    });
+  } catch (error) {
+    console.log(error);
+  }
+  return nearbyPlaces;
+}
+
+
 function test() {
     // Ignore lol
     const coords = [
@@ -133,4 +178,4 @@ function test() {
     });
 }
 
-export {getSafetyLatLong, getRestroomsLatLong, locationToLatLong};
+export {getSafetyLatLong, getRestroomsLatLong, locationToLatLong, getNearbyPlaces};
