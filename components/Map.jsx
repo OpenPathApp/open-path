@@ -2,8 +2,6 @@ import { GoogleMap, Marker, useLoadScript, InfoWindow } from "@react-google-maps
 import { useMemo, useState, useEffect, useContext } from "react";
 import { getSafetyLatLong, getRestroomsLatLong } from "@/data";
 import { FilterContext } from '../src/FilterContext';
-
-import { useMemo } from "react";
 import './Map.css'
 
 export const nearbyPlaces = {name:[], coords:[]}
