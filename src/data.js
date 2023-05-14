@@ -130,7 +130,7 @@ async function getNearbyPlaces(coordinates, type) {
     coordinates[0] +
     "%2C" +
     coordinates[1] +
-    "&radius=1500&type=" +
+    "&radius=15000&type=" +
     type +
     "&keyword=cruise&key=AIzaSyAP6ZI6gP5_EmAu8md6W8uXBNM3eEXqx_A";
 
