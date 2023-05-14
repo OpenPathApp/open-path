@@ -1,5 +1,5 @@
 import { GoogleMap, Marker, useLoadScript, InfoWindow } from "@react-google-maps/api";
-import { useMemo, useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext } from "react";
 import { getSafetyLatLong, getRestroomsLatLong, getHotelsLatLong, getRestaurantsLatLong } from "@/data";
 import { FilterContext } from '../src/FilterContext';
 
@@ -105,7 +105,30 @@ export const Map = ({ center }) => {
             </InfoWindow>
           )}
 
-          
+          {showRestaurants && restaurants.map((restaurant) => (
+            <Marker
+              key={restaurant.name}
+              position={{ lat: restaurant.latitude, lng: restaurant.longitude }}
+              onClick={() => setSelectedRestaurant(restaurant)}
+              icon={"http://maps.google.com/mapfiles/ms/icons/green-dot.png"}
+            />
+          ))}
+
+          {selectedRestaurant && (
+            <InfoWindow
+              position={{ lat: selectedRestaurant.latitude, lng: selectedRestaurant.longitude }}
+              onCloseClick={() => {
+                setSelectedRestaurant(null);
+                setSafetyRating(null);
+              }}
+            >
+              <div>
+                <h1>{selectedRestaurant.name}</h1>
+                {<p>Safety: {safetyRating}</p>}
+              </div>
+            </InfoWindow>
+          )}
+    
         </GoogleMap>
       )}
     </div>
