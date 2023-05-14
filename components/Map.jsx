@@ -1,6 +1,6 @@
 import { GoogleMap, Marker, useLoadScript, InfoWindow } from "@react-google-maps/api";
 import { useMemo, useState, useEffect, useContext } from "react";
-import { getRestroomsLatLong } from "@/data";
+import { getSafetyLatLong, getRestroomsLatLong } from "@/data";
 import { FilterContext } from '../src/FilterContext';
 
 export const Map = () => {
@@ -18,36 +18,49 @@ export const Map = () => {
 
   const { showRestrooms } = useContext(FilterContext);
 
+  const [safetyRating, setSafetyRating] = useState(null);
+
+  useEffect(() => {
+    if (selectedRestroom) {
+      getSafetyLatLong([[selectedRestroom.latitude, selectedRestroom.longitude]])
+        .then((ratings) => setSafetyRating(ratings[0]));
+    }
+  }, [selectedRestroom]);
+
   return (
     <div className="h-[48rem] w-3/4 m-auto rounded-lg mt-10 overflow-hidden">
       {!isLoaded ? (
         <h1>Loading...</h1>
       ) : (
         <GoogleMap
-        mapContainerClassName="h-3/4 w-full"
-        center={center}
-        zoom={14}
-      >
-        {showRestrooms && restrooms.map((restroom) => (
-          <Marker
-            key={restroom.name}
-            position={{ lat: restroom.latitude, lng: restroom.longitude }}
-            onClick={() => setSelectedRestroom(restroom)}
-            icon={"http://maps.google.com/mapfiles/ms/icons/pink-dot.png"}
-          />
-        ))}
+          mapContainerClassName="h-3/4 w-full"
+          center={center}
+          zoom={14}
+        >
+          {showRestrooms && restrooms.map((restroom) => (
+            <Marker
+              key={restroom.name}
+              position={{ lat: restroom.latitude, lng: restroom.longitude }}
+              onClick={() => setSelectedRestroom(restroom)}
+              icon={"http://maps.google.com/mapfiles/ms/icons/pink-dot.png"}
+            />
+          ))}
 
-        {selectedRestroom && (
-          <InfoWindow
-            position={{ lat: selectedRestroom.latitude, lng: selectedRestroom.longitude }}
-            onCloseClick={() => setSelectedRestroom(null)}
-          >
-            <div>
-              <h2>{selectedRestroom.name}</h2>
-            </div>
-          </InfoWindow>
-        )}
-      </GoogleMap>
+          {selectedRestroom && (
+            <InfoWindow
+              position={{ lat: selectedRestroom.latitude, lng: selectedRestroom.longitude }}
+              onCloseClick={() => {
+                setSelectedRestroom(null);
+                setSafetyRating(null);
+              }}
+            >
+              <div>
+                <h2>{selectedRestroom.name}</h2>
+                {<p>Safety: {safetyRating}</p>}
+              </div>
+            </InfoWindow>
+          )}
+        </GoogleMap>
       )}
     </div>
   );
